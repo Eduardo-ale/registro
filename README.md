@@ -54,12 +54,6 @@
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-        input:focus, textarea:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-            outline: none;
         }
         button {
             background: #4CAF50;
@@ -105,7 +99,7 @@
         <label for="descricao">Descrição:</label>
         <textarea id="descricao" placeholder="Descreva o que foi feito"></textarea>
         <label for="url">URL do Chamado:</label>
-        <input type="text" id="url" placeholder="Cole a URL do chamado">
+        <input type="url" id="url" placeholder="Cole a URL do chamado">
         <button onclick="adicionarChamado()">Adicionar Chamado</button>
         <table>
             <thead>
@@ -127,16 +121,21 @@
         let chamados = [];
 
         function adicionarChamado() {
-            const titulo = document.getElementById("titulo").value;
-            const descricao = document.getElementById("descricao").value;
-            const url = document.getElementById("url").value;
-            if (!titulo || !descricao || !url) return alert("Por favor, preencha todos os campos.");
+            const titulo = document.getElementById("titulo").value.trim();
+            const descricao = document.getElementById("descricao").value.trim();
+            const url = document.getElementById("url").value.trim();
+            
+            if (!titulo || !descricao || !url) {
+                alert("Por favor, preencha todos os campos corretamente.");
+                return;
+            }
 
-            const id = chamados.length > 0 ? chamados[chamados.length - 1].id + 1 : 1;
+            const id = chamados.length + 1;
             const dataAbertura = new Date().toLocaleString();
-            const novoChamado = { id, titulo, descricao, url, dataAbertura, dataEncerramento: "-", status: "Aberto" };
-            chamados.push(novoChamado);
+            
+            chamados.push({ id, titulo, descricao, url, dataAbertura, dataEncerramento: "-", status: "Aberto" });
             atualizarTabela();
+            limparCampos();
         }
 
         function alterarStatus(id) {
@@ -151,8 +150,8 @@
         function atualizarTabela() {
             const tbody = document.getElementById("chamados");
             tbody.innerHTML = "";
-            let abertos = 0;
-            let fechados = 0;
+            let abertos = 0, fechados = 0;
+            
             chamados.forEach(chamado => {
                 if (chamado.status === "Aberto") abertos++;
                 else fechados++;
@@ -166,12 +165,17 @@
                         <td>${chamado.dataEncerramento}</td>
                         <td class="${chamado.status === 'Aberto' ? 'open' : 'closed'}">${chamado.status}</td>
                         <td class="actions"><button onclick="alterarStatus(${chamado.id})">Alterar Status</button></td>
-                    </tr>
-                `;
+                    </tr>`;
             });
             document.getElementById("totalChamados").textContent = chamados.length;
             document.getElementById("chamadosAbertos").textContent = abertos;
             document.getElementById("chamadosFechados").textContent = fechados;
+        }
+
+        function limparCampos() {
+            document.getElementById("titulo").value = "";
+            document.getElementById("descricao").value = "";
+            document.getElementById("url").value = "";
         }
     </script>
 </body>
